@@ -50,17 +50,13 @@ fn parse_input(input: &str) -> Vec<PwEntry> {
     return vec![];
 }
 
-fn count_valid_passwords(pwds: Vec<PwEntry>) -> i32 {
-    pwds.into_iter().filter(|p| p.is_valid()).count() as i32
-}
-
-fn count_valid_passwords2(pwds: Vec<PwEntry>) -> i32 {
-    pwds.into_iter().filter(|p| p.is_valid2()).count() as i32
+fn count_valid_passwords(pwds: Vec<PwEntry>, func: fn(&PwEntry) -> bool) -> i32 {
+    pwds.into_iter().filter(|p| func(p)).count() as i32
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::day2::{count_valid_passwords, PwEntry, parse_input, count_valid_passwords2};
+    use crate::day2::{count_valid_passwords, PwEntry, parse_input};
     use std::{env, fs};
     use std::path::Path;
 
@@ -73,7 +69,7 @@ mod tests {
             PwEntry{min:1,max:3,letter:'b', pw: String::from("cdefg")},
             PwEntry{min:2,max:9,letter:'c', pw: String::from("ccccccccc")},
         ];
-        assert_eq!(count_valid_passwords(input),2);
+        assert_eq!(count_valid_passwords(input, PwEntry::is_valid),2);
     }
 
     #[test]
@@ -93,7 +89,7 @@ mod tests {
     #[test]
     fn example_with_parser() {
         let input = String::from("1-3 a: abcde\n1-3 b: cdefg\n2-19 c: ccccccccc");
-        assert_eq!(count_valid_passwords(parse_input(&input)),2);
+        assert_eq!(count_valid_passwords(parse_input(&input), PwEntry::is_valid),2);
     }
 
     #[test]
@@ -103,7 +99,7 @@ mod tests {
 
         let contents = fs::read_to_string(path1.join(path)).unwrap();
 
-        let res = count_valid_passwords(parse_input(&contents));
+        let res = count_valid_passwords(parse_input(&contents), PwEntry::is_valid);
 
         println!("Counted {} valid passwords", res);
 
@@ -117,7 +113,7 @@ mod tests {
 
         let contents = fs::read_to_string(path1.join(path)).unwrap();
 
-        let res = count_valid_passwords2(parse_input(&contents));
+        let res = count_valid_passwords(parse_input(&contents), PwEntry::is_valid2);
 
         println!("Counted {} valid passwords", res);
 
